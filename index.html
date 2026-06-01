@@ -251,10 +251,17 @@ async function loadData() {
     const US_SYMS   = ['SPY', 'VOO', 'IVV'];
     const BOND_SYMS = ['TLT', 'IEF', 'BND', 'AGG'];
 
+    const getR = (e) => {
+      if (!e) return null;
+      const v = e.rs6m ?? e.r120d ?? e.r60d ?? null;
+      log('  ' + (e.symbol||'?') + ': rs6m=' + e.rs6m + ' r120d=' + e.r120d + ' r60d=' + e.r60d + ' => ' + v);
+      return typeof v === 'number' ? v : null;
+    };
+
     const findFirst = (syms) => {
       for (const s of syms) {
         const f = allETFs.find(e => (e.symbol ?? e.ticker ?? '').toUpperCase() === s);
-        if (f) { log('찾음: ' + s + ' r120d=' + f.r120d); return f; }
+        if (f) { log('찾음: ' + s); return f; }
         log('없음: ' + s);
       }
       return null;
@@ -264,9 +271,9 @@ async function loadData() {
     const usItem   = findFirst(US_SYMS);
     const bondItem = findFirst(BOND_SYMS);
 
-    const krR    = krItem?.r120d   ?? null;
-    const usR    = usItem?.r120d   ?? null;
-    const bondR  = bondItem?.r120d ?? null;
+    const krR    = getR(krItem);
+    const usR    = getR(usItem);
+    const bondR  = getR(bondItem);
     const krName   = krItem?.name   ?? 'iShares MSCI South Korea (EWY)';
     const usName   = usItem?.name   ?? 'SPDR S&P 500 ETF (SPY)';
     const bondName = bondItem?.name ?? 'iShares 20+ Year Treasury (TLT)';
@@ -274,7 +281,7 @@ async function loadData() {
     const usSym    = usItem?.symbol   ?? 'SPY';
     const bondSym  = bondItem?.symbol ?? 'TLT';
 
-    log('krR=' + krR + ' usR=' + usR + ' bondR=' + bondR);
+    log('최종: krR=' + krR + ' usR=' + usR + ' bondR=' + bondR);
 
     if (krR === null || usR === null) showDebug();
 
@@ -289,7 +296,7 @@ async function loadData() {
     ];
     for (const s of BOND_SYMS) {
       const f = allETFs.find(e => (e.symbol ?? e.ticker ?? '').toUpperCase() === s);
-      if (f && f.r120d != null) etfRows.push({ tag:'bond', label:'채권', name:f.name ?? s, sym:s, ret:f.r120d });
+      const r = getR(f); if (r != null) etfRows.push({ tag:'bond', label:'채권', name:f.name ?? s, sym:s, ret:r });
     }
     renderETFs(etfRows);
 
