@@ -116,19 +116,19 @@
 
 <div class="metrics">
   <div class="metric">
-    <div class="metric-label">KOSPI<br>6개월 수익률</div>
+    <div class="metric-label">KOSPI<br>6개월 RS 점수</div>
     <div class="metric-val neutral" id="krVal">—</div>
     <div class="metric-name" id="krName">—</div>
     <div id="krPill"></div>
   </div>
   <div class="metric">
-    <div class="metric-label">S&P 500<br>6개월 수익률</div>
+    <div class="metric-label">S&amp;P 500<br>6개월 RS 점수</div>
     <div class="metric-val neutral" id="usVal">—</div>
     <div class="metric-name" id="usName">—</div>
     <div id="usPill"></div>
   </div>
   <div class="metric">
-    <div class="metric-label">미국 채권<br>6개월 수익률</div>
+    <div class="metric-label">미국 채권<br>6개월 RS 점수</div>
     <div class="metric-val neutral" id="bondVal">—</div>
     <div class="metric-name" id="bondName">—</div>
   </div>
@@ -178,8 +178,9 @@ function showDebug() {
   document.getElementById('debugCard').style.display = 'block';
 }
 
-const fmt = v => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
-const colorCls = v => v == null ? 'neutral' : v >= 0 ? 'pos' : 'neg';
+const fmt = v => v == null || isNaN(v) ? '—' : Number(v).toFixed(1) + '점';
+const fmtSign = v => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(1) + '점';
+const colorCls = v => v == null ? 'neutral' : v >= 50 ? 'pos' : 'neg';
 
 function setBanner(type, title, desc) {
   document.getElementById('banner').className = 'banner ' + type;
@@ -251,10 +252,11 @@ async function loadData() {
     const US_SYMS   = ['SPY', 'VOO', 'IVV'];
     const BOND_SYMS = ['TLT', 'IEF', 'BND', 'AGG'];
 
+    // rs6m = 상대강도 점수(0~100). 높을수록 강세. 수익률이 아니므로 fmt/표시 분리
     const getR = (e) => {
       if (!e) return null;
       const v = e.rs6m ?? e.r120d ?? e.r60d ?? null;
-      log('  ' + (e.symbol||'?') + ': rs6m=' + e.rs6m + ' r120d=' + e.r120d + ' r60d=' + e.r60d + ' => ' + v);
+      log('  ' + (e.symbol||'?') + ': rs6m=' + e.rs6m + ' r120d=' + e.r120d + ' => ' + v);
       return typeof v === 'number' ? v : null;
     };
 
@@ -317,9 +319,9 @@ async function loadData() {
 
 function decide(krR, usR, bondR) {
   if (krR === null || usR === null) { setBanner('idle','데이터 없음','수익률 데이터를 가져오지 못했습니다. 하단 디버그 로그를 확인하세요.'); return; }
-  if (krR < 0 && usR < 0) {
-    if (bondR === null || bondR < 0) setBanner('cash','현금 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)})과 채권(${fmt(bondR)}) 모두 마이너스 → 전액 현금(MMF/CMA) 대기`);
-    else setBanner('bond','미국 채권 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)}) 모두 마이너스 → KODEX/TIGER 미국채10년 ETF로 대피`);
+  if (krR < 50 && usR < 50) {
+    if (bondR === null || bondR < 50) setBanner('cash','현금 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)})과 채권(${fmt(bondR)}) 모두 약세(50점 미만) → 전액 현금(MMF/CMA) 대기`);
+    else setBanner('bond','미국 채권 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)}) 모두 약세(50점 미만) → KODEX/TIGER 미국채10년 ETF로 대피`);
   } else if (krR >= usR) {
     setBanner('kr','한국 주식 100% 보유',`KOSPI(${fmt(krR)}) > S&P500(${fmt(usR)}) → KODEX 200 또는 TIGER 200 ETF 매수`);
   } else {
@@ -336,7 +338,7 @@ function renderMetrics(krR, usR, bondR, krName, usName, bondName) {
   set('kr', krR, krName); set('us', usR, usName); set('bond', bondR, bondName);
   document.getElementById('krPill').innerHTML = '';
   document.getElementById('usPill').innerHTML = '';
-  if (krR !== null && usR !== null && !(krR < 0 && usR < 0)) {
+  if (krR !== null && usR !== null && !(krR < 50 && usR < 50)) {
     const win = krR >= usR ? 'kr' : 'us';
     document.getElementById(win + 'Pill').innerHTML = `<span class="winner-pill ${win}">▲ 강세</span>`;
   }
@@ -346,7 +348,7 @@ function renderLogic(krR, usR, bondR) {
   const rows = [];
   if (krR === null || usR === null) { rows.push({t:'warn', txt:'주식 수익률 데이터를 가져오지 못했습니다'}); }
   else {
-    const both = krR < 0 && usR < 0;
+    const both = krR < 50 && usR < 50;
     rows.push({t: both?'fail':'pass', txt:`주식 점검 — 한국 ${fmt(krR)} / 미국 ${fmt(usR)} → ${both?'둘 다 하락, 주식 이탈':'한쪽 이상 상승'}`});
     if (both) rows.push({t: bondR!=null&&bondR>=0?'pass':'warn', txt:`채권 점검 — ${fmt(bondR)} → ${bondR!=null&&bondR>=0?'플러스, 채권 보유':'마이너스, 현금 대기'}`});
     else rows.push({t:'pass', txt:`강세 자산 → ${krR>=usR?'한국':'미국'} 주식 (${fmt(krR>=usR?krR:usR)}) 100% 보유`});
