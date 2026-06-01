@@ -6,151 +6,95 @@
 <title>듀얼 모멘텀 대시보드</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --border: rgba(0,0,0,0.10);
-    --border-light: rgba(0,0,0,0.06);
-    --text: #1a1a18;
-    --muted: #73726c;
-    --hint: #b4b2a9;
-    --green-bg: #E1F5EE; --green-border: #5DCAA5; --green-text: #085041; --green-sub: #0F6E56;
-    --purple-bg: #EEEDFE; --purple-border: #AFA9EC; --purple-text: #3C3489; --purple-sub: #534AB7;
-    --amber-bg: #FAEEDA; --amber-border: #EF9F27; --amber-text: #633806; --amber-sub: #854F0B;
-    --red-bg: #FCEBEB; --red-border: #F09595; --red-text: #791F1F; --red-sub: #A32D2D;
-    --gray-bg: #F1EFE8; --gray-border: #D3D1C7; --gray-text: #5F5E5A; --gray-sub: #888780;
-    --pos: #0F6E56; --neg: #A32D2D;
-    --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+    --bg: #f5f4f0; --surface: #fff; --border: rgba(0,0,0,0.10); --border-light: rgba(0,0,0,0.06);
+    --text: #1a1a18; --muted: #73726c; --hint: #b4b2a9;
+    --green-bg:#E1F5EE; --green-bd:#5DCAA5; --green-t:#085041; --green-s:#0F6E56;
+    --purple-bg:#EEEDFE; --purple-bd:#AFA9EC; --purple-t:#3C3489; --purple-s:#534AB7;
+    --amber-bg:#FAEEDA; --amber-bd:#EF9F27; --amber-t:#633806; --amber-s:#854F0B;
+    --red-bg:#FCEBEB; --red-bd:#F09595; --red-t:#791F1F; --red-s:#A32D2D;
+    --gray-bg:#F1EFE8; --gray-bd:#D3D1C7; --gray-t:#5F5E5A; --gray-s:#888780;
+    --pos:#0F6E56; --neg:#A32D2D;
+    --r-sm:6px; --r-md:10px; --r-lg:14px;
   }
-
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #1a1a18; --surface: #242422; --border: rgba(255,255,255,0.10); --border-light: rgba(255,255,255,0.06);
-      --text: #e8e6df; --muted: #888780; --hint: #5f5e5a;
-      --green-bg: #04342C; --green-border: #1D9E75; --green-text: #9FE1CB; --green-sub: #5DCAA5;
-      --purple-bg: #26215C; --purple-border: #7F77DD; --purple-text: #CECBF6; --purple-sub: #AFA9EC;
-      --amber-bg: #412402; --amber-border: #BA7517; --amber-text: #FAC775; --amber-sub: #EF9F27;
-      --red-bg: #501313; --red-border: #E24B4A; --red-text: #F7C1C1; --red-sub: #F09595;
-      --gray-bg: #2C2C2A; --gray-border: #5F5E5A; --gray-text: #D3D1C7; --gray-sub: #888780;
-      --pos: #5DCAA5; --neg: #F09595;
+      --bg:#1a1a18; --surface:#242422; --border:rgba(255,255,255,0.10); --border-light:rgba(255,255,255,0.06);
+      --text:#e8e6df; --muted:#888780; --hint:#5f5e5a;
+      --green-bg:#04342C; --green-bd:#1D9E75; --green-t:#9FE1CB; --green-s:#5DCAA5;
+      --purple-bg:#26215C; --purple-bd:#7F77DD; --purple-t:#CECBF6; --purple-s:#AFA9EC;
+      --amber-bg:#412402; --amber-bd:#BA7517; --amber-t:#FAC775; --amber-s:#EF9F27;
+      --red-bg:#501313; --red-bd:#E24B4A; --red-t:#F7C1C1; --red-s:#F09595;
+      --gray-bg:#2C2C2A; --gray-bd:#5F5E5A; --gray-t:#D3D1C7; --gray-s:#888780;
+      --pos:#5DCAA5; --neg:#F09595;
     }
   }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif;
-    background: var(--bg); color: var(--text);
-    min-height: 100vh; padding: 28px 18px 48px;
-    max-width: 640px; margin: 0 auto;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* Header */
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 28px 18px 48px; max-width: 640px; margin: 0 auto; -webkit-font-smoothing: antialiased; }
   .header { margin-bottom: 22px; }
   .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
   .header h1 { font-size: 19px; font-weight: 500; }
-  .refresh-btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 12px; color: var(--muted);
-    border: 0.5px solid var(--border); border-radius: var(--radius-sm);
-    padding: 6px 10px; cursor: pointer; background: transparent;
-    transition: background 0.15s;
-  }
+  .refresh-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); border: 0.5px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px; cursor: pointer; background: transparent; }
   .refresh-btn:hover { background: var(--gray-bg); }
-  .refresh-icon { display: inline-block; transition: transform 0.4s; }
-  .refresh-icon.spin { animation: spin 0.5s linear; }
+  .spin { display: inline-block; animation: spin 0.5s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .header-sub { font-size: 12px; color: var(--hint); }
-
-  /* Decision banner */
-  .banner {
-    border-radius: var(--radius-lg); padding: 20px 22px; margin-bottom: 14px;
-    border: 1px solid transparent; transition: background 0.3s, border-color 0.3s;
-  }
-  .banner.kr     { background: var(--green-bg);  border-color: var(--green-border); }
-  .banner.us     { background: var(--purple-bg); border-color: var(--purple-border); }
-  .banner.bond   { background: var(--amber-bg);  border-color: var(--amber-border); }
-  .banner.cash   { background: var(--red-bg);    border-color: var(--red-border); }
-  .banner.idle   { background: var(--gray-bg);   border-color: var(--gray-border); }
-
-  .banner-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; opacity: 0.7; }
-  .banner-title  { font-size: 22px; font-weight: 500; line-height: 1.2; margin-bottom: 6px; }
-  .banner-desc   { font-size: 13px; line-height: 1.5; opacity: 0.85; }
-
-  .banner.kr     .banner-eyebrow, .banner.kr     .banner-title { color: var(--green-text); }
-  .banner.kr     .banner-desc   { color: var(--green-sub); }
-  .banner.us     .banner-eyebrow, .banner.us     .banner-title { color: var(--purple-text); }
-  .banner.us     .banner-desc   { color: var(--purple-sub); }
-  .banner.bond   .banner-eyebrow, .banner.bond   .banner-title { color: var(--amber-text); }
-  .banner.bond   .banner-desc   { color: var(--amber-sub); }
-  .banner.cash   .banner-eyebrow, .banner.cash   .banner-title { color: var(--red-text); }
-  .banner.cash   .banner-desc   { color: var(--red-sub); }
-  .banner.idle   .banner-eyebrow, .banner.idle   .banner-title { color: var(--gray-text); }
-  .banner.idle   .banner-desc   { color: var(--gray-sub); }
-
-  /* Metrics */
+  .banner { border-radius: var(--r-lg); padding: 20px 22px; margin-bottom: 14px; border: 1px solid transparent; }
+  .banner.kr   { background: var(--green-bg);  border-color: var(--green-bd); }
+  .banner.us   { background: var(--purple-bg); border-color: var(--purple-bd); }
+  .banner.bond { background: var(--amber-bg);  border-color: var(--amber-bd); }
+  .banner.cash { background: var(--red-bg);    border-color: var(--red-bd); }
+  .banner.idle { background: var(--gray-bg);   border-color: var(--gray-bd); }
+  .banner-eye  { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; opacity: 0.7; }
+  .banner-title{ font-size: 22px; font-weight: 500; line-height: 1.2; margin-bottom: 6px; }
+  .banner-desc { font-size: 13px; line-height: 1.5; opacity: 0.85; }
+  .banner.kr   .banner-eye, .banner.kr   .banner-title { color: var(--green-t); }
+  .banner.kr   .banner-desc { color: var(--green-s); }
+  .banner.us   .banner-eye, .banner.us   .banner-title { color: var(--purple-t); }
+  .banner.us   .banner-desc { color: var(--purple-s); }
+  .banner.bond .banner-eye, .banner.bond .banner-title { color: var(--amber-t); }
+  .banner.bond .banner-desc { color: var(--amber-s); }
+  .banner.cash .banner-eye, .banner.cash .banner-title { color: var(--red-t); }
+  .banner.cash .banner-desc { color: var(--red-s); }
+  .banner.idle .banner-eye, .banner.idle .banner-title { color: var(--gray-t); }
+  .banner.idle .banner-desc { color: var(--gray-s); }
   .metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 14px; }
-  .metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 13px 14px; }
+  .metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-md); padding: 13px 14px; }
   .metric-label { font-size: 10px; color: var(--hint); margin-bottom: 7px; line-height: 1.3; }
   .metric-val { font-size: 20px; font-weight: 500; line-height: 1; }
   .metric-val.pos { color: var(--pos); }
   .metric-val.neg { color: var(--neg); }
   .metric-val.neutral { color: var(--muted); }
-  .metric-name { font-size: 10px; color: var(--hint); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .winner-pill {
-    display: inline-block; font-size: 9px; font-weight: 500;
-    padding: 2px 6px; border-radius: 10px; margin-top: 5px;
-  }
-  .winner-pill.kr   { background: var(--green-bg);  color: var(--green-text); }
-  .winner-pill.us   { background: var(--purple-bg); color: var(--purple-text); }
-
-  /* Card */
-  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 12px; }
+  .metric-name { font-size: 10px; color: var(--hint); margin-top: 4px; }
+  .winner-pill { display: inline-block; font-size: 9px; font-weight: 500; padding: 2px 6px; border-radius: 10px; margin-top: 5px; }
+  .winner-pill.kr { background: var(--green-bg); color: var(--green-t); }
+  .winner-pill.us { background: var(--purple-bg); color: var(--purple-t); }
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 16px 18px; margin-bottom: 12px; }
   .card-label { font-size: 10px; font-weight: 500; color: var(--hint); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 13px; }
-
-  /* Logic */
   .logic-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border-light); font-size: 13px; line-height: 1.5; }
   .logic-row:last-child { border-bottom: none; padding-bottom: 0; }
-  .logic-icon { font-size: 13px; margin-top: 1px; flex-shrink: 0; }
-  .logic-icon.pass { color: var(--pos); }
-  .logic-icon.fail { color: var(--neg); }
-  .logic-icon.warn { color: #854F0B; }
-  .logic-text { color: var(--text); }
+  .li { font-size: 13px; margin-top: 1px; flex-shrink: 0; }
+  .li.pass { color: var(--pos); } .li.fail { color: var(--neg); } .li.warn { color: var(--amber-s); }
   .data-ts { font-size: 11px; color: var(--hint); margin-top: 10px; }
-
-  /* ETF rows */
   .etf-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid var(--border-light); }
   .etf-row:last-child { border-bottom: none; padding-bottom: 0; }
   .etf-tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
-  .etf-tag.kr   { background: var(--green-bg);  color: var(--green-text); }
-  .etf-tag.us   { background: var(--purple-bg); color: var(--purple-text); }
-  .etf-tag.bond { background: var(--amber-bg);  color: var(--amber-text); }
+  .etf-tag.kr   { background: var(--green-bg);  color: var(--green-t); }
+  .etf-tag.us   { background: var(--purple-bg); color: var(--purple-t); }
+  .etf-tag.bond { background: var(--amber-bg);  color: var(--amber-t); }
   .etf-info { flex: 1; min-width: 0; }
   .etf-name { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .etf-sym  { font-size: 11px; color: var(--hint); margin-top: 1px; }
   .etf-ret  { font-size: 14px; font-weight: 500; min-width: 62px; text-align: right; }
-  .etf-ret.pos { color: var(--pos); }
-  .etf-ret.neg { color: var(--neg); }
-  .etf-ret.neutral { color: var(--muted); }
-
-  /* Checklist */
+  .etf-ret.pos { color: var(--pos); } .etf-ret.neg { color: var(--neg); } .etf-ret.neutral { color: var(--muted); }
   .check-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border-light); }
   .check-row:last-child { border-bottom: none; padding-bottom: 0; }
   .check-num { width: 20px; height: 20px; border-radius: 50%; background: var(--gray-bg); border: 0.5px solid var(--border); font-size: 10px; font-weight: 500; color: var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
   .check-text { font-size: 13px; color: var(--text); line-height: 1.5; }
   .check-text strong { font-weight: 500; }
-
-  /* Footer */
   .footer { margin-top: 20px; font-size: 11px; color: var(--hint); line-height: 1.6; }
   .footer a { color: var(--hint); }
-
-  /* Error */
-  .err { font-size: 13px; color: var(--neg); background: var(--red-bg); border-radius: var(--radius-sm); padding: 10px 12px; }
-
-  @media (max-width: 420px) {
-    .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); }
-    .metric-val { font-size: 18px; }
-  }
+  .err { font-size: 13px; color: var(--neg); background: var(--red-bg); border-radius: var(--r-sm); padding: 10px 12px; }
+  @media (max-width: 420px) { .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 </style>
 </head>
 <body>
@@ -158,15 +102,15 @@
 <div class="header">
   <div class="header-top">
     <h1>듀얼 모멘텀 대시보드</h1>
-    <button class="refresh-btn" onclick="loadData()" id="refreshBtn">
-      <span class="refresh-icon" id="refreshIcon">↻</span> 새로고침
+    <button class="refresh-btn" onclick="loadData()">
+      <span id="spinIcon">↻</span> 새로고침
     </button>
   </div>
   <div class="header-sub" id="headerSub">easyinvesting.app 데이터 기반 · 매월 말 리밸런싱 판단</div>
 </div>
 
 <div class="banner idle" id="banner">
-  <div class="banner-eyebrow">이번 달 판단</div>
+  <div class="banner-eye">이번 달 판단</div>
   <div class="banner-title" id="bannerTitle">불러오는 중...</div>
   <div class="banner-desc"  id="bannerDesc">잠시만 기다려 주세요</div>
 </div>
@@ -193,7 +137,7 @@
 
 <div class="card">
   <div class="card-label">판단 근거</div>
-  <div id="logicWrap"><div class="logic-row"><span class="logic-icon warn">!</span><span class="logic-text">데이터 로딩 중...</span></div></div>
+  <div id="logicWrap"><div class="logic-row"><span class="li warn">!</span><span>데이터 로딩 중...</span></div></div>
   <div class="data-ts" id="dataTs"></div>
 </div>
 
@@ -216,33 +160,17 @@
 </div>
 
 <script>
-const KR_KW   = ['KODEX 200', 'TIGER 200', 'KODEX코스피200'];
-const US_KW   = ['TIGER 미국S&P500', 'KODEX 미국S&P500', 'ACE 미국S&P500'];
-const BOND_KW = ['KODEX 미국채10년', 'TIGER 미국채10년', 'ACE 미국채10년', 'KODEX 미국채30년'];
+const BASE = 'https://easyinvesting.app';
 
-const fmt = v => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
-const cls = v => v == null ? 'neutral' : v >= 0 ? 'pos' : 'neg';
+// KOSPI 대표 종목 티커 (069500.KS = KODEX 200)
+const KR_TICKER   = '069500';
+// 미국 S&P500 대표 (SPY)
+const US_TICKER   = 'SPY';
+// 미국 장기채 대표 (TLT)
+const BOND_TICKER = 'TLT';
 
-function find(items, kws) {
-  for (const kw of kws) {
-    const f = items.find(e => e.name?.includes(kw));
-    if (f) return f;
-  }
-  return null;
-}
-
-function flatten(data) {
-  const out = [];
-  for (const cat of Object.values(data.categories ?? {})) {
-    if (Array.isArray(cat)) { out.push(...cat); continue; }
-    if (cat && typeof cat === 'object') {
-      for (const v of Object.values(cat)) {
-        if (Array.isArray(v)) out.push(...v);
-      }
-    }
-  }
-  return out;
-}
+const fmt = v => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
+const colorCls = v => v == null ? 'neutral' : v >= 0 ? 'pos' : 'neg';
 
 function setBanner(type, title, desc) {
   const b = document.getElementById('banner');
@@ -251,121 +179,166 @@ function setBanner(type, title, desc) {
   document.getElementById('bannerDesc').textContent  = desc;
 }
 
-function decide(kr, us, bond) {
-  const krR = kr?.r120d ?? null, usR = us?.r120d ?? null, bondR = bond?.r120d ?? null;
-  if (krR === null || usR === null) { setBanner('idle','데이터 없음','ETF 데이터를 찾지 못했습니다. 새로고침하세요.'); return; }
+function decide(krR, usR, bondR) {
+  if (krR === null || usR === null) {
+    setBanner('idle', '데이터 없음', '수익률 데이터를 가져오지 못했습니다. 새로고침하세요.'); return;
+  }
   if (krR < 0 && usR < 0) {
-    if (bondR === null || bondR < 0) setBanner('cash','현금 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)})과 채권(${fmt(bondR)}) 모두 마이너스 → 전액 현금(MMF/CMA) 대기`);
-    else                             setBanner('bond','미국 채권 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)}) 모두 마이너스 → KODEX/TIGER 미국채10년 ETF로 대피`);
-  } else if (krR >= usR)             setBanner('kr','한국 주식 100% 보유',`KOSPI(${fmt(krR)}) > S&P500(${fmt(usR)}) → KODEX 200 또는 TIGER 200 ETF 매수`);
-  else                               setBanner('us','미국 주식 100% 보유',`S&P500(${fmt(usR)}) > KOSPI(${fmt(krR)}) → TIGER/KODEX 미국S&P500 ETF 매수`);
-}
-
-function metrics(kr, us, bond) {
-  const krR = kr?.r120d ?? null, usR = us?.r120d ?? null, bondR = bond?.r120d ?? null;
-  const $krV = document.getElementById('krVal');
-  $krV.textContent = fmt(krR); $krV.className = 'metric-val ' + cls(krR);
-  document.getElementById('krName').textContent = kr?.name ?? '—';
-
-  const $usV = document.getElementById('usVal');
-  $usV.textContent = fmt(usR); $usV.className = 'metric-val ' + cls(usR);
-  document.getElementById('usName').textContent = us?.name ?? '—';
-
-  const $bV = document.getElementById('bondVal');
-  $bV.textContent = fmt(bondR); $bV.className = 'metric-val ' + cls(bondR);
-  document.getElementById('bondName').textContent = bond?.name ?? '—';
-
-  if (krR !== null && usR !== null && !(krR < 0 && usR < 0)) {
-    const win = krR >= usR ? 'kr' : 'us';
-    document.getElementById(win === 'kr' ? 'krPill' : 'usPill').innerHTML =
-      `<span class="winner-pill ${win}">▲ 강세</span>`;
+    if (bondR === null || bondR < 0)
+      setBanner('cash', '현금 보유', `주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)})과 채권(${fmt(bondR)}) 모두 마이너스 → 전액 현금(MMF/CMA) 대기`);
+    else
+      setBanner('bond', '미국 채권 보유', `주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)}) 모두 마이너스 → KODEX/TIGER 미국채10년 ETF로 대피`);
+  } else if (krR >= usR) {
+    setBanner('kr', '한국 주식 100% 보유', `KOSPI(${fmt(krR)}) > S&P500(${fmt(usR)}) → KODEX 200 또는 TIGER 200 ETF 매수`);
+  } else {
+    setBanner('us', '미국 주식 100% 보유', `S&P500(${fmt(usR)}) > KOSPI(${fmt(krR)}) → TIGER/KODEX 미국S&P500 ETF 매수`);
   }
 }
 
-function logic(kr, us, bond) {
-  const krR = kr?.r120d ?? null, usR = us?.r120d ?? null, bondR = bond?.r120d ?? null;
+function renderMetrics(krR, usR, bondR, krName, usName, bondName) {
+  const $kr = document.getElementById('krVal');
+  $kr.textContent = fmt(krR); $kr.className = 'metric-val ' + colorCls(krR);
+  document.getElementById('krName').textContent = krName;
+
+  const $us = document.getElementById('usVal');
+  $us.textContent = fmt(usR); $us.className = 'metric-val ' + colorCls(usR);
+  document.getElementById('usName').textContent = usName;
+
+  const $bd = document.getElementById('bondVal');
+  $bd.textContent = fmt(bondR); $bd.className = 'metric-val ' + colorCls(bondR);
+  document.getElementById('bondName').textContent = bondName;
+
+  document.getElementById('krPill').innerHTML = '';
+  document.getElementById('usPill').innerHTML = '';
+  if (krR !== null && usR !== null && !(krR < 0 && usR < 0)) {
+    const win = krR >= usR ? 'kr' : 'us';
+    document.getElementById(win + 'Pill').innerHTML = `<span class="winner-pill ${win}">▲ 강세</span>`;
+  }
+}
+
+function renderLogic(krR, usR, bondR) {
   const rows = [];
-  if (krR === null || usR === null) { rows.push({ t:'warn', txt:'주식 ETF 데이터를 찾지 못했습니다' }); }
-  else {
+  if (krR === null || usR === null) {
+    rows.push({ t:'warn', txt:'주식 수익률 데이터를 가져오지 못했습니다' });
+  } else {
     const both = krR < 0 && usR < 0;
-    rows.push({ t: both ? 'fail' : 'pass', txt:`주식 점검 — 한국 ${fmt(krR)} / 미국 ${fmt(usR)} → ${both ? '둘 다 하락, 주식 시장 이탈' : '한쪽 이상 상승'}` });
+    rows.push({ t: both ? 'fail' : 'pass', txt: `주식 점검 — 한국 ${fmt(krR)} / 미국 ${fmt(usR)} → ${both ? '둘 다 하락, 주식 이탈' : '한쪽 이상 상승'}` });
     if (both) {
-      rows.push({ t: bondR !== null && bondR >= 0 ? 'pass' : 'warn', txt:`채권 점검 — ${fmt(bondR)} → ${bondR !== null && bondR >= 0 ? '플러스, 채권 보유' : '마이너스, 현금 대기'}` });
+      rows.push({ t: bondR !== null && bondR >= 0 ? 'pass' : 'warn', txt: `채권 점검 — ${fmt(bondR)} → ${bondR !== null && bondR >= 0 ? '플러스, 채권 보유' : '마이너스, 현금 대기'}` });
     } else {
       const w = krR >= usR ? '한국' : '미국';
-      rows.push({ t:'pass', txt:`강세 자산 → ${w} 주식 (${krR >= usR ? fmt(krR) : fmt(usR)}) 100% 보유` });
+      rows.push({ t:'pass', txt: `강세 자산 → ${w} 주식 (${krR >= usR ? fmt(krR) : fmt(usR)}) 100% 보유` });
     }
   }
   document.getElementById('logicWrap').innerHTML = rows.map(r =>
-    `<div class="logic-row"><span class="logic-icon ${r.t}">${r.t==='pass'?'✓':r.t==='fail'?'✗':'!'}</span><span class="logic-text">${r.txt}</span></div>`
+    `<div class="logic-row"><span class="li ${r.t}">${r.t==='pass'?'✓':r.t==='fail'?'✗':'!'}</span><span>${r.txt}</span></div>`
   ).join('');
 }
 
-function etfs(kr, us, bond, all) {
-  const list = [
-    { e:kr,   t:'kr',   l:'한국 주식' },
-    { e:us,   t:'us',   l:'미국 주식' },
-    { e:bond, t:'bond', l:'채권' },
-  ];
-  BOND_KW.forEach(kw => {
-    const f = all.find(e => e.name?.includes(kw) && e !== bond);
-    if (f) list.push({ e:f, t:'bond', l:'채권' });
-  });
-  document.getElementById('etfWrap').innerHTML = list
-    .filter(({e}) => e)
-    .map(({e,t,l}) => {
-      const r = e.r120d ?? null;
-      return `<div class="etf-row">
-        <span class="etf-tag ${t}">${l}</span>
-        <div class="etf-info"><div class="etf-name">${e.name??'—'}</div><div class="etf-sym">${e.symbol??''}</div></div>
-        <span class="etf-ret ${cls(r)}">${fmt(r)}</span>
-      </div>`;
-    }).join('');
+function renderETFs(items) {
+  document.getElementById('etfWrap').innerHTML = items.map(({tag, label, name, sym, ret}) => `
+    <div class="etf-row">
+      <span class="etf-tag ${tag}">${label}</span>
+      <div class="etf-info"><div class="etf-name">${name}</div><div class="etf-sym">${sym}</div></div>
+      <span class="etf-ret ${colorCls(ret)}">${fmt(ret)}</span>
+    </div>`).join('');
+}
+
+async function apiFetch(path) {
+  const url = BASE + path;
+  try {
+    const r = await fetch(url);
+    if (r.ok) return r.json();
+  } catch {}
+  // CORS fallback
+  const r2 = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+  if (!r2.ok) throw new Error('HTTP ' + r2.status + ' (' + path + ')');
+  return r2.json();
+}
+
+// ret_6m 추출: /api/rs/top (한국), /api/rs/us/top (미국) 에서 특정 티커 찾기
+function extractRet6m(list, ticker) {
+  const item = list.find(e => e.ticker === ticker || e.ticker === ticker + '.KS' || e.ticker === ticker + '.KQ');
+  if (!item) return null;
+  // ret_6m 또는 ret_1m*6 등 있는 필드 우선순위
+  return item.ret_6m ?? item.ret6m ?? null;
 }
 
 async function loadData() {
-  const icon = document.getElementById('refreshIcon');
-  icon.classList.add('spin');
+  const icon = document.getElementById('spinIcon');
+  icon.className = 'spin';
   document.getElementById('headerSub').textContent = '데이터 불러오는 중...';
 
-  const DIRECT = 'https://easyinvesting.app/api/etf-screener';
-  const PROXY  = 'https://corsproxy.io/?' + encodeURIComponent(DIRECT);
-
-  async function tryFetch(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return res.json();
-  }
-
   try {
-    let data;
-    try {
-      data = await tryFetch(DIRECT);
-    } catch {
-      data = await tryFetch(PROXY);
+    // 세 API를 병렬 호출
+    const [krData, usData, etfData] = await Promise.all([
+      apiFetch('/api/rs/top?limit=3000'),
+      apiFetch('/api/rs/us/top?limit=6000'),
+      apiFetch('/api/etf-screener'),
+    ]);
+
+    // 한국 KOSPI (KODEX 200 = 069500)
+    const krItem = (krData.data ?? krData).find(e =>
+      e.ticker === KR_TICKER || e.ticker === KR_TICKER + '.KS'
+    );
+    const krR    = krItem ? (krItem.ret_6m ?? krItem.ret6m ?? null) : null;
+    const krName = krItem ? (krItem.name ?? 'KODEX 200') : 'KODEX 200';
+
+    // 미국 S&P500 (SPY)
+    const usItem = (usData.data ?? usData).find(e => e.ticker === US_TICKER);
+    const usR    = usItem ? (usItem.ret_6m ?? usItem.ret6m ?? null) : null;
+    const usName = usItem ? (usItem.name ?? 'SPDR S&P 500 ETF') : 'SPDR S&P 500 ETF';
+
+    // 채권: etf-screener에서 TLT 찾기
+    const allETFs = [];
+    for (const cat of Object.values(etfData.categories ?? {})) {
+      const arr = Array.isArray(cat) ? cat : Object.values(cat).filter(Array.isArray).flat();
+      allETFs.push(...arr);
     }
-    const all = flatten(data);
 
-    const kr   = find(all, KR_KW);
-    const us   = find(all, US_KW);
-    const bond = find(all, BOND_KW);
+    const bondItem = allETFs.find(e => e.symbol === BOND_TICKER || e.ticker === BOND_TICKER);
+    // etf-screener에서 r120d가 null이면 us/top에서 TLT 수익률 가져오기
+    let bondR = bondItem?.r120d ?? null;
+    if (bondR === null) {
+      const tltItem = (usData.data ?? usData).find(e => e.ticker === BOND_TICKER);
+      bondR = tltItem ? (tltItem.ret_6m ?? tltItem.ret6m ?? null) : null;
+    }
+    const bondName = bondItem?.name ?? 'iShares 20+ Year Treasury Bond ETF (TLT)';
 
-    decide(kr, us, bond);
-    metrics(kr, us, bond);
-    logic(kr, us, bond);
-    etfs(kr, us, bond, all);
+    decide(krR, usR, bondR);
+    renderMetrics(krR, usR, bondR, krName, usName, 'TLT · ' + bondName.slice(0, 20));
+    renderLogic(krR, usR, bondR);
 
-    const ts = data.cached_at ? new Date(data.cached_at).toLocaleString('ko-KR') : '—';
+    // ETF 상세 행
+    const etfRows = [
+      { tag:'kr',   label:'한국 주식', name: krName,   sym: KR_TICKER,   ret: krR },
+      { tag:'us',   label:'미국 주식', name: usName,   sym: US_TICKER,   ret: usR },
+      { tag:'bond', label:'채권',      name: bondName, sym: BOND_TICKER, ret: bondR },
+    ];
+    // 추가 채권 ETF
+    ['IEF', 'BND', 'AGG'].forEach(sym => {
+      const f = allETFs.find(e => e.symbol === sym || e.ticker === sym);
+      if (f) {
+        let r = f.r120d ?? null;
+        if (r === null) {
+          const fi = (usData.data ?? usData).find(e => e.ticker === sym);
+          r = fi ? (fi.ret_6m ?? fi.ret6m ?? null) : null;
+        }
+        etfRows.push({ tag:'bond', label:'채권', name: f.name ?? sym, sym, ret: r });
+      }
+    });
+    renderETFs(etfRows);
+
+    const ts = etfData.cached_at ? new Date(etfData.cached_at).toLocaleString('ko-KR') : new Date().toLocaleString('ko-KR');
     document.getElementById('dataTs').textContent = '데이터 기준: ' + ts;
-    document.getElementById('headerSub').textContent =
-      '마지막 조회: ' + new Date().toLocaleTimeString('ko-KR') + ' · easyinvesting.app';
+    document.getElementById('headerSub').textContent = '마지막 조회: ' + new Date().toLocaleTimeString('ko-KR') + ' · easyinvesting.app';
 
   } catch(e) {
-    setBanner('idle','데이터 로드 실패', e.message + ' — 새로고침을 눌러 재시도하세요');
+    setBanner('idle', '데이터 로드 실패', e.message + ' — 새로고침을 눌러 재시도하세요');
     document.getElementById('etfWrap').innerHTML = `<div class="err">${e.message}</div>`;
     document.getElementById('headerSub').textContent = '로드 실패 · 새로고침을 눌러주세요';
   } finally {
-    setTimeout(() => icon.classList.remove('spin'), 500);
+    icon.className = '';
   }
 }
 
