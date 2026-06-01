@@ -83,6 +83,8 @@
   .etf-name { font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .etf-sym  { font-size: 11px; color: var(--hint); margin-top: 1px; }
   .etf-ret  { font-size: 14px; font-weight: 500; min-width: 62px; text-align: right; }
+  .etf-ret6m { font-size: 11px; text-align: right; margin-top: 2px; }
+  .metric-ret { font-size: 11px; margin-top: 3px; }
   .etf-ret.pos { color: var(--pos); } .etf-ret.neg { color: var(--neg); } .etf-ret.neutral { color: var(--muted); }
   .check-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border-light); }
   .check-row:last-child { border-bottom: none; padding-bottom: 0; }
@@ -119,12 +121,14 @@
     <div class="metric-label">KOSPI<br>6개월 RS 점수</div>
     <div class="metric-val neutral" id="krVal">—</div>
     <div class="metric-name" id="krName">—</div>
+    <div class="metric-ret" id="krRet"></div>
     <div id="krPill"></div>
   </div>
   <div class="metric">
     <div class="metric-label">S&amp;P 500<br>6개월 RS 점수</div>
     <div class="metric-val neutral" id="usVal">—</div>
     <div class="metric-name" id="usName">—</div>
+    <div class="metric-ret" id="usRet"></div>
     <div id="usPill"></div>
   </div>
   <div class="metric">
@@ -252,11 +256,15 @@ async function loadData() {
     const US_SYMS   = ['SPY', 'VOO', 'IVV'];
     const BOND_SYMS = ['TLT', 'IEF', 'BND', 'AGG'];
 
-    // rs6m = 상대강도 점수(0~100). 높을수록 강세. 수익률이 아니므로 fmt/표시 분리
+    // rs6m = 상대강도 점수(0~100), r120d = 실제 6개월 수익률(%)
     const getR = (e) => {
       if (!e) return null;
       const v = e.rs6m ?? e.r120d ?? e.r60d ?? null;
-      log('  ' + (e.symbol||'?') + ': rs6m=' + e.rs6m + ' r120d=' + e.r120d + ' => ' + v);
+      return typeof v === 'number' ? v : null;
+    };
+    const getRet = (e) => {
+      if (!e) return null;
+      const v = e.r120d ?? e.r60d ?? null;
       return typeof v === 'number' ? v : null;
     };
 
@@ -276,6 +284,9 @@ async function loadData() {
     const krR    = getR(krItem);
     const usR    = getR(usItem);
     const bondR  = getR(bondItem);
+    const krRet    = getRet(krItem);
+    const usRet    = getRet(usItem);
+    const bondRet  = getRet(bondItem);
     const krName   = krItem?.name   ?? 'iShares MSCI South Korea (EWY)';
     const usName   = usItem?.name   ?? 'SPDR S&P 500 ETF (SPY)';
     const bondName = bondItem?.name ?? 'iShares 20+ Year Treasury (TLT)';
@@ -288,17 +299,17 @@ async function loadData() {
     if (krR === null || usR === null) showDebug();
 
     decide(krR, usR, bondR);
-    renderMetrics(krR, usR, bondR, krName, usName, bondName);
+    renderMetrics(krR, usR, bondR, krName, usName, bondName, krRet, usRet, bondRet);
     renderLogic(krR, usR, bondR);
 
     // ETF 상세 행
     const etfRows = [
-      { tag:'kr',   label:'한국 주식', name:krName,   sym:krSym,   ret:krR },
-      { tag:'us',   label:'미국 주식', name:usName,   sym:usSym,   ret:usR },
+      { tag:'kr',   label:'한국 주식', name:krName,   sym:krSym,   ret:krR,   ret6m:krRet },
+      { tag:'us',   label:'미국 주식', name:usName,   sym:usSym,   ret:usR,   ret6m:usRet },
     ];
     for (const s of BOND_SYMS) {
       const f = allETFs.find(e => (e.symbol ?? e.ticker ?? '').toUpperCase() === s);
-      const r = getR(f); if (r != null) etfRows.push({ tag:'bond', label:'채권', name:f.name ?? s, sym:s, ret:r });
+      const r = getR(f); if (r != null) etfRows.push({ tag:'bond', label:'채권', name:f.name ?? s, sym:s, ret:r, ret6m:getRet(f) });
     }
     renderETFs(etfRows);
 
@@ -329,13 +340,16 @@ function decide(krR, usR, bondR) {
   }
 }
 
-function renderMetrics(krR, usR, bondR, krName, usName, bondName) {
-  const set = (id, v, name) => {
+function renderMetrics(krR, usR, bondR, krName, usName, bondName, krRet, usRet, bondRet) {
+  const fmtRet = r => r == null ? '' : (r >= 0 ? '+' : '') + r.toFixed(2) + '%';
+  const set = (id, v, name, ret) => {
     const el = document.getElementById(id + 'Val');
     el.textContent = fmt(v); el.className = 'metric-val ' + colorCls(v);
     document.getElementById(id + 'Name').textContent = name;
+    const retEl = document.getElementById(id + 'Ret');
+    if (retEl) { retEl.textContent = ret != null ? '6개월 수익률 ' + fmtRet(ret) : ''; retEl.className = 'metric-ret ' + (ret == null ? '' : ret >= 0 ? 'pos' : 'neg'); }
   };
-  set('kr', krR, krName); set('us', usR, usName); set('bond', bondR, bondName);
+  set('kr', krR, krName, krRet); set('us', usR, usName, usRet); set('bond', bondR, bondName, bondRet);
   document.getElementById('krPill').innerHTML = '';
   document.getElementById('usPill').innerHTML = '';
   if (krR !== null && usR !== null && !(krR < 50 && usR < 50)) {
@@ -358,13 +372,19 @@ function renderLogic(krR, usR, bondR) {
   ).join('');
 }
 
+const fmtRet6m = r => r == null ? null : (r >= 0 ? '+' : '') + r.toFixed(2) + '%';
 function renderETFs(items) {
-  document.getElementById('etfWrap').innerHTML = items.map(({tag,label,name,sym,ret}) =>
-    `<div class="etf-row">
+  document.getElementById('etfWrap').innerHTML = items.map(({tag,label,name,sym,ret,ret6m}) => {
+    const retStr = fmtRet6m(ret6m);
+    return `<div class="etf-row">
       <span class="etf-tag ${tag}">${label}</span>
       <div class="etf-info"><div class="etf-name">${name}</div><div class="etf-sym">${sym}</div></div>
-      <span class="etf-ret ${colorCls(ret)}">${fmt(ret)}</span>
-    </div>`).join('');
+      <div style="text-align:right;min-width:90px">
+        <div class="etf-ret ${colorCls(ret)}">${fmt(ret)}</div>
+        ${retStr ? `<div class="etf-ret6m ${ret6m >= 0 ? 'pos' : 'neg'}">${retStr}</div>` : '<div class="etf-ret6m" style="color:var(--hint)">수익률 —</div>'}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 loadData();
