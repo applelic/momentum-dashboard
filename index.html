@@ -236,8 +236,12 @@ async function loadData() {
   try {
     // ETF 스크리너 단일 소스 — IEF/BND가 r120d로 정상 동작함을 확인
     log('--- ETF 스크리너 조회 ---');
-    const etfData = await apiFetch('/api/etf-screener');
+    const [etfData, retData] = await Promise.all([
+      apiFetch('/api/etf-screener'),
+      fetch('/api/returns').then(r => r.json()).catch(() => ({}))
+    ]);
     log('cached_at: ' + etfData.cached_at);
+    log('returns: ' + JSON.stringify(retData));
 
     const allETFs = [];
     for (const cat of Object.values(etfData.categories ?? {})) {
@@ -264,6 +268,10 @@ async function loadData() {
     };
     const getRet = (e) => {
       if (!e) return null;
+      const sym = (e.symbol ?? '').toUpperCase();
+      // 1순위: 야후파이낸스 서버리스 함수 결과
+      if (retData[sym] != null) return retData[sym];
+      // 2순위: ETF 스크리너 r120d/r60d
       const v = e.r120d ?? e.r60d ?? null;
       return typeof v === 'number' ? v : null;
     };
