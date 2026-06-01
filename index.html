@@ -7,8 +7,8 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #f5f4f0; --surface: #fff; --border: rgba(0,0,0,0.10); --border-light: rgba(0,0,0,0.06);
-    --text: #1a1a18; --muted: #73726c; --hint: #b4b2a9;
+    --bg:#f5f4f0; --surface:#fff; --border:rgba(0,0,0,0.10); --border-light:rgba(0,0,0,0.06);
+    --text:#1a1a18; --muted:#73726c; --hint:#b4b2a9;
     --green-bg:#E1F5EE; --green-bd:#5DCAA5; --green-t:#085041; --green-s:#0F6E56;
     --purple-bg:#EEEDFE; --purple-bd:#AFA9EC; --purple-t:#3C3489; --purple-s:#534AB7;
     --amber-bg:#FAEEDA; --amber-bd:#EF9F27; --amber-t:#633806; --amber-s:#854F0B;
@@ -35,8 +35,8 @@
   .header h1 { font-size: 19px; font-weight: 500; }
   .refresh-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); border: 0.5px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px; cursor: pointer; background: transparent; }
   .refresh-btn:hover { background: var(--gray-bg); }
-  .spin { display: inline-block; animation: spin 0.5s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .spinning { display: inline-block; animation: spin 0.6s linear infinite; }
   .header-sub { font-size: 12px; color: var(--hint); }
   .banner { border-radius: var(--r-lg); padding: 20px 22px; margin-bottom: 14px; border: 1px solid transparent; }
   .banner.kr   { background: var(--green-bg);  border-color: var(--green-bd); }
@@ -44,26 +44,24 @@
   .banner.bond { background: var(--amber-bg);  border-color: var(--amber-bd); }
   .banner.cash { background: var(--red-bg);    border-color: var(--red-bd); }
   .banner.idle { background: var(--gray-bg);   border-color: var(--gray-bd); }
-  .banner-eye  { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; opacity: 0.7; }
-  .banner-title{ font-size: 22px; font-weight: 500; line-height: 1.2; margin-bottom: 6px; }
-  .banner-desc { font-size: 13px; line-height: 1.5; opacity: 0.85; }
+  .banner-eye   { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; opacity: 0.7; }
+  .banner-title { font-size: 22px; font-weight: 500; line-height: 1.2; margin-bottom: 6px; }
+  .banner-desc  { font-size: 13px; line-height: 1.5; opacity: 0.85; }
   .banner.kr   .banner-eye, .banner.kr   .banner-title { color: var(--green-t); }
-  .banner.kr   .banner-desc { color: var(--green-s); }
+  .banner.kr   .banner-desc  { color: var(--green-s); }
   .banner.us   .banner-eye, .banner.us   .banner-title { color: var(--purple-t); }
-  .banner.us   .banner-desc { color: var(--purple-s); }
+  .banner.us   .banner-desc  { color: var(--purple-s); }
   .banner.bond .banner-eye, .banner.bond .banner-title { color: var(--amber-t); }
-  .banner.bond .banner-desc { color: var(--amber-s); }
+  .banner.bond .banner-desc  { color: var(--amber-s); }
   .banner.cash .banner-eye, .banner.cash .banner-title { color: var(--red-t); }
-  .banner.cash .banner-desc { color: var(--red-s); }
+  .banner.cash .banner-desc  { color: var(--red-s); }
   .banner.idle .banner-eye, .banner.idle .banner-title { color: var(--gray-t); }
-  .banner.idle .banner-desc { color: var(--gray-s); }
+  .banner.idle .banner-desc  { color: var(--gray-s); }
   .metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 14px; }
   .metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-md); padding: 13px 14px; }
   .metric-label { font-size: 10px; color: var(--hint); margin-bottom: 7px; line-height: 1.3; }
   .metric-val { font-size: 20px; font-weight: 500; line-height: 1; }
-  .metric-val.pos { color: var(--pos); }
-  .metric-val.neg { color: var(--neg); }
-  .metric-val.neutral { color: var(--muted); }
+  .metric-val.pos { color: var(--pos); } .metric-val.neg { color: var(--neg); } .metric-val.neutral { color: var(--muted); }
   .metric-name { font-size: 10px; color: var(--hint); margin-top: 4px; }
   .winner-pill { display: inline-block; font-size: 9px; font-weight: 500; padding: 2px 6px; border-radius: 10px; margin-top: 5px; }
   .winner-pill.kr { background: var(--green-bg); color: var(--green-t); }
@@ -91,6 +89,7 @@
   .check-num { width: 20px; height: 20px; border-radius: 50%; background: var(--gray-bg); border: 0.5px solid var(--border); font-size: 10px; font-weight: 500; color: var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
   .check-text { font-size: 13px; color: var(--text); line-height: 1.5; }
   .check-text strong { font-weight: 500; }
+  .debug-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 12px; font-size: 11px; font-family: monospace; color: var(--muted); white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
   .footer { margin-top: 20px; font-size: 11px; color: var(--hint); line-height: 1.6; }
   .footer a { color: var(--hint); }
   .err { font-size: 13px; color: var(--neg); background: var(--red-bg); border-radius: var(--r-sm); padding: 10px 12px; }
@@ -146,6 +145,11 @@
   <div id="etfWrap"><div style="font-size:13px;color:var(--hint);padding:8px 0">로딩 중...</div></div>
 </div>
 
+<div id="debugCard" style="display:none" class="card">
+  <div class="card-label">디버그 로그 <button onclick="document.getElementById('debugCard').style.display='none'" style="font-size:10px;cursor:pointer;background:none;border:none;color:var(--hint);">닫기</button></div>
+  <div class="debug-box" id="debugLog"></div>
+</div>
+
 <div class="card">
   <div class="card-label">매월 말 체크리스트</div>
   <div class="check-row"><div class="check-num">1</div><div class="check-text">이 페이지를 열고 <strong>새로고침</strong> 클릭</div></div>
@@ -161,53 +165,180 @@
 
 <script>
 const BASE = 'https://easyinvesting.app';
+const logs = [];
 
-// KOSPI 대표 종목 티커 (069500.KS = KODEX 200)
-const KR_TICKER   = '069500';
-// 미국 S&P500 대표 (SPY)
-const US_TICKER   = 'SPY';
-// 미국 장기채 대표 (TLT)
-const BOND_TICKER = 'TLT';
+function log(msg) {
+  logs.push(msg);
+  const el = document.getElementById('debugLog');
+  if (el) el.textContent = logs.slice(-40).join('\n');
+  console.log('[DM]', msg);
+}
+
+function showDebug() {
+  document.getElementById('debugCard').style.display = 'block';
+}
 
 const fmt = v => v == null || isNaN(v) ? '—' : (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
 const colorCls = v => v == null ? 'neutral' : v >= 0 ? 'pos' : 'neg';
 
 function setBanner(type, title, desc) {
-  const b = document.getElementById('banner');
-  b.className = 'banner ' + type;
+  document.getElementById('banner').className = 'banner ' + type;
   document.getElementById('bannerTitle').textContent = title;
   document.getElementById('bannerDesc').textContent  = desc;
 }
 
-function decide(krR, usR, bondR) {
-  if (krR === null || usR === null) {
-    setBanner('idle', '데이터 없음', '수익률 데이터를 가져오지 못했습니다. 새로고침하세요.'); return;
+async function apiFetch(path) {
+  const url = BASE + path;
+  log('fetch: ' + url);
+  try {
+    const r = await fetch(url);
+    log('direct status: ' + r.status);
+    if (r.ok) return r.json();
+    throw new Error('HTTP ' + r.status);
+  } catch(e) {
+    log('direct failed: ' + e.message + ', trying proxy...');
+    const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+    const r2 = await fetch(proxy);
+    log('proxy status: ' + r2.status);
+    if (!r2.ok) throw new Error('proxy HTTP ' + r2.status);
+    return r2.json();
   }
+}
+
+// 배열 또는 객체에서 ret_6m 값을 가진 항목 찾기 (티커 다양한 형식 대응)
+function findByTicker(list, ticker) {
+  const t = ticker.toLowerCase();
+  return list.find(e => {
+    const candidates = [e.ticker, e.symbol, e.code].filter(Boolean).map(s => s.toLowerCase().replace('.ks','').replace('.kq','').replace('.us',''));
+    return candidates.includes(t);
+  });
+}
+
+// 6개월 수익률 필드를 여러 이름으로 시도
+function getRet6m(item) {
+  if (!item) return null;
+  const v = item.ret_6m ?? item.ret6m ?? item.return_6m ?? item.r6m ?? item.rs6m ?? null;
+  log('  ret6m fields: ret_6m=' + item.ret_6m + ' ret6m=' + item.ret6m + ' r6m=' + item.r6m);
+  return typeof v === 'number' ? v : null;
+}
+
+async function loadData() {
+  logs.length = 0;
+  const icon = document.getElementById('spinIcon');
+  icon.className = 'spinning';
+  document.getElementById('headerSub').textContent = '데이터 불러오는 중...';
+
+  try {
+    // 1. 한국 주식 상위 목록에서 069500 (KODEX 200) 찾기
+    log('--- 한국 주식 조회 ---');
+    const krData = await apiFetch('/api/rs/top?limit=3000');
+    const krList = Array.isArray(krData) ? krData : (krData.data ?? krData.items ?? krData.stocks ?? []);
+    log('kr list length: ' + krList.length);
+    if (krList.length > 0) log('kr sample keys: ' + Object.keys(krList[0]).join(', '));
+
+    const krItem = findByTicker(krList, '069500');
+    log('kr item found: ' + (krItem ? krItem.ticker + ' / ' + krItem.name : 'NOT FOUND'));
+    const krR    = getRet6m(krItem);
+    const krName = krItem?.name ?? 'KODEX 200';
+    log('krR = ' + krR);
+
+    // 2. 미국 주식 상위 목록에서 SPY 찾기
+    log('--- 미국 주식 조회 ---');
+    const usData = await apiFetch('/api/rs/us/top?limit=6000');
+    const usList = Array.isArray(usData) ? usData : (usData.data ?? usData.items ?? usData.stocks ?? []);
+    log('us list length: ' + usList.length);
+    if (usList.length > 0) log('us sample keys: ' + Object.keys(usList[0]).join(', '));
+
+    const usItem = findByTicker(usList, 'SPY');
+    log('us item found: ' + (usItem ? usItem.ticker + ' / ' + usItem.name : 'NOT FOUND'));
+    const usR    = getRet6m(usItem);
+    const usName = usItem?.name ?? 'SPDR S&P 500 ETF (SPY)';
+    log('usR = ' + usR);
+
+    // 3. 채권: ETF 스크리너에서 TLT 찾기, 없으면 us/top에서
+    log('--- 채권 조회 ---');
+    const etfData = await apiFetch('/api/etf-screener');
+    log('etf cached_at: ' + etfData.cached_at);
+    const allETFs = [];
+    for (const cat of Object.values(etfData.categories ?? {})) {
+      if (Array.isArray(cat)) { allETFs.push(...cat); continue; }
+      if (cat && typeof cat === 'object') {
+        for (const v of Object.values(cat)) { if (Array.isArray(v)) allETFs.push(...v); }
+      }
+    }
+    log('etf list length: ' + allETFs.length);
+    if (allETFs.length > 0) log('etf sample keys: ' + Object.keys(allETFs[0]).join(', '));
+
+    let bondItem = findByTicker(allETFs, 'TLT');
+    log('TLT in etf-screener: ' + (bondItem ? 'found, r120d=' + bondItem.r120d : 'NOT FOUND'));
+
+    let bondR = bondItem?.r120d ?? null;
+    if (bondR === null) {
+      const tltUs = findByTicker(usList, 'TLT');
+      bondR = getRet6m(tltUs);
+      log('TLT from us/top: ' + bondR);
+    }
+    const bondName = bondItem?.name ?? 'iShares 20+ Year Treasury (TLT)';
+    log('bondR = ' + bondR);
+
+    // 데이터 없으면 디버그 표시
+    if (krR === null || usR === null) {
+      showDebug();
+    }
+
+    // 판단 로직
+    decide(krR, usR, bondR);
+    renderMetrics(krR, usR, bondR, krName, usName, bondName);
+    renderLogic(krR, usR, bondR);
+
+    const etfRows = [
+      { tag:'kr',   label:'한국 주식', name:krName,   sym:'069500', ret:krR },
+      { tag:'us',   label:'미국 주식', name:usName,   sym:'SPY',    ret:usR },
+      { tag:'bond', label:'채권',      name:bondName, sym:'TLT',    ret:bondR },
+    ];
+    for (const sym of ['IEF', 'BND']) {
+      const f = findByTicker(allETFs, sym) ?? findByTicker(usList, sym);
+      if (f) {
+        const r = f.r120d ?? getRet6m(f) ?? null;
+        etfRows.push({ tag:'bond', label:'채권', name:f.name ?? sym, sym, ret:r });
+      }
+    }
+    renderETFs(etfRows);
+
+    const ts = etfData.cached_at ? new Date(etfData.cached_at).toLocaleString('ko-KR') : new Date().toLocaleString('ko-KR');
+    document.getElementById('dataTs').textContent = '데이터 기준: ' + ts;
+    document.getElementById('headerSub').textContent = '마지막 조회: ' + new Date().toLocaleTimeString('ko-KR') + ' · easyinvesting.app';
+
+  } catch(e) {
+    log('ERROR: ' + e.message);
+    showDebug();
+    setBanner('idle', '데이터 로드 실패', e.message + ' — 새로고침을 눌러 재시도하세요');
+    document.getElementById('etfWrap').innerHTML = `<div class="err">${e.message}</div>`;
+    document.getElementById('headerSub').textContent = '로드 실패 · 새로고침을 눌러주세요';
+  } finally {
+    icon.className = '';
+  }
+}
+
+function decide(krR, usR, bondR) {
+  if (krR === null || usR === null) { setBanner('idle','데이터 없음','수익률 데이터를 가져오지 못했습니다. 하단 디버그 로그를 확인하세요.'); return; }
   if (krR < 0 && usR < 0) {
-    if (bondR === null || bondR < 0)
-      setBanner('cash', '현금 보유', `주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)})과 채권(${fmt(bondR)}) 모두 마이너스 → 전액 현금(MMF/CMA) 대기`);
-    else
-      setBanner('bond', '미국 채권 보유', `주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)}) 모두 마이너스 → KODEX/TIGER 미국채10년 ETF로 대피`);
+    if (bondR === null || bondR < 0) setBanner('cash','현금 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)})과 채권(${fmt(bondR)}) 모두 마이너스 → 전액 현금(MMF/CMA) 대기`);
+    else setBanner('bond','미국 채권 보유',`주식(한국 ${fmt(krR)}, 미국 ${fmt(usR)}) 모두 마이너스 → KODEX/TIGER 미국채10년 ETF로 대피`);
   } else if (krR >= usR) {
-    setBanner('kr', '한국 주식 100% 보유', `KOSPI(${fmt(krR)}) > S&P500(${fmt(usR)}) → KODEX 200 또는 TIGER 200 ETF 매수`);
+    setBanner('kr','한국 주식 100% 보유',`KOSPI(${fmt(krR)}) > S&P500(${fmt(usR)}) → KODEX 200 또는 TIGER 200 ETF 매수`);
   } else {
-    setBanner('us', '미국 주식 100% 보유', `S&P500(${fmt(usR)}) > KOSPI(${fmt(krR)}) → TIGER/KODEX 미국S&P500 ETF 매수`);
+    setBanner('us','미국 주식 100% 보유',`S&P500(${fmt(usR)}) > KOSPI(${fmt(krR)}) → TIGER/KODEX 미국S&P500 ETF 매수`);
   }
 }
 
 function renderMetrics(krR, usR, bondR, krName, usName, bondName) {
-  const $kr = document.getElementById('krVal');
-  $kr.textContent = fmt(krR); $kr.className = 'metric-val ' + colorCls(krR);
-  document.getElementById('krName').textContent = krName;
-
-  const $us = document.getElementById('usVal');
-  $us.textContent = fmt(usR); $us.className = 'metric-val ' + colorCls(usR);
-  document.getElementById('usName').textContent = usName;
-
-  const $bd = document.getElementById('bondVal');
-  $bd.textContent = fmt(bondR); $bd.className = 'metric-val ' + colorCls(bondR);
-  document.getElementById('bondName').textContent = bondName;
-
+  const set = (id, v, name) => {
+    const el = document.getElementById(id + 'Val');
+    el.textContent = fmt(v); el.className = 'metric-val ' + colorCls(v);
+    document.getElementById(id + 'Name').textContent = name;
+  };
+  set('kr', krR, krName); set('us', usR, usName); set('bond', bondR, bondName);
   document.getElementById('krPill').innerHTML = '';
   document.getElementById('usPill').innerHTML = '';
   if (krR !== null && usR !== null && !(krR < 0 && usR < 0)) {
@@ -218,17 +349,12 @@ function renderMetrics(krR, usR, bondR, krName, usName, bondName) {
 
 function renderLogic(krR, usR, bondR) {
   const rows = [];
-  if (krR === null || usR === null) {
-    rows.push({ t:'warn', txt:'주식 수익률 데이터를 가져오지 못했습니다' });
-  } else {
+  if (krR === null || usR === null) { rows.push({t:'warn', txt:'주식 수익률 데이터를 가져오지 못했습니다'}); }
+  else {
     const both = krR < 0 && usR < 0;
-    rows.push({ t: both ? 'fail' : 'pass', txt: `주식 점검 — 한국 ${fmt(krR)} / 미국 ${fmt(usR)} → ${both ? '둘 다 하락, 주식 이탈' : '한쪽 이상 상승'}` });
-    if (both) {
-      rows.push({ t: bondR !== null && bondR >= 0 ? 'pass' : 'warn', txt: `채권 점검 — ${fmt(bondR)} → ${bondR !== null && bondR >= 0 ? '플러스, 채권 보유' : '마이너스, 현금 대기'}` });
-    } else {
-      const w = krR >= usR ? '한국' : '미국';
-      rows.push({ t:'pass', txt: `강세 자산 → ${w} 주식 (${krR >= usR ? fmt(krR) : fmt(usR)}) 100% 보유` });
-    }
+    rows.push({t: both?'fail':'pass', txt:`주식 점검 — 한국 ${fmt(krR)} / 미국 ${fmt(usR)} → ${both?'둘 다 하락, 주식 이탈':'한쪽 이상 상승'}`});
+    if (both) rows.push({t: bondR!=null&&bondR>=0?'pass':'warn', txt:`채권 점검 — ${fmt(bondR)} → ${bondR!=null&&bondR>=0?'플러스, 채권 보유':'마이너스, 현금 대기'}`});
+    else rows.push({t:'pass', txt:`강세 자산 → ${krR>=usR?'한국':'미국'} 주식 (${fmt(krR>=usR?krR:usR)}) 100% 보유`});
   }
   document.getElementById('logicWrap').innerHTML = rows.map(r =>
     `<div class="logic-row"><span class="li ${r.t}">${r.t==='pass'?'✓':r.t==='fail'?'✗':'!'}</span><span>${r.txt}</span></div>`
@@ -236,110 +362,12 @@ function renderLogic(krR, usR, bondR) {
 }
 
 function renderETFs(items) {
-  document.getElementById('etfWrap').innerHTML = items.map(({tag, label, name, sym, ret}) => `
-    <div class="etf-row">
+  document.getElementById('etfWrap').innerHTML = items.map(({tag,label,name,sym,ret}) =>
+    `<div class="etf-row">
       <span class="etf-tag ${tag}">${label}</span>
       <div class="etf-info"><div class="etf-name">${name}</div><div class="etf-sym">${sym}</div></div>
       <span class="etf-ret ${colorCls(ret)}">${fmt(ret)}</span>
     </div>`).join('');
-}
-
-async function apiFetch(path) {
-  const url = BASE + path;
-  try {
-    const r = await fetch(url);
-    if (r.ok) return r.json();
-  } catch {}
-  // CORS fallback
-  const r2 = await fetch('https://corsproxy.io/?' + encodeURIComponent(url));
-  if (!r2.ok) throw new Error('HTTP ' + r2.status + ' (' + path + ')');
-  return r2.json();
-}
-
-// ret_6m 추출: /api/rs/top (한국), /api/rs/us/top (미국) 에서 특정 티커 찾기
-function extractRet6m(list, ticker) {
-  const item = list.find(e => e.ticker === ticker || e.ticker === ticker + '.KS' || e.ticker === ticker + '.KQ');
-  if (!item) return null;
-  // ret_6m 또는 ret_1m*6 등 있는 필드 우선순위
-  return item.ret_6m ?? item.ret6m ?? null;
-}
-
-async function loadData() {
-  const icon = document.getElementById('spinIcon');
-  icon.className = 'spin';
-  document.getElementById('headerSub').textContent = '데이터 불러오는 중...';
-
-  try {
-    // 세 API를 병렬 호출
-    const [krData, usData, etfData] = await Promise.all([
-      apiFetch('/api/rs/top?limit=3000'),
-      apiFetch('/api/rs/us/top?limit=6000'),
-      apiFetch('/api/etf-screener'),
-    ]);
-
-    // 한국 KOSPI (KODEX 200 = 069500)
-    const krItem = (krData.data ?? krData).find(e =>
-      e.ticker === KR_TICKER || e.ticker === KR_TICKER + '.KS'
-    );
-    const krR    = krItem ? (krItem.ret_6m ?? krItem.ret6m ?? null) : null;
-    const krName = krItem ? (krItem.name ?? 'KODEX 200') : 'KODEX 200';
-
-    // 미국 S&P500 (SPY)
-    const usItem = (usData.data ?? usData).find(e => e.ticker === US_TICKER);
-    const usR    = usItem ? (usItem.ret_6m ?? usItem.ret6m ?? null) : null;
-    const usName = usItem ? (usItem.name ?? 'SPDR S&P 500 ETF') : 'SPDR S&P 500 ETF';
-
-    // 채권: etf-screener에서 TLT 찾기
-    const allETFs = [];
-    for (const cat of Object.values(etfData.categories ?? {})) {
-      const arr = Array.isArray(cat) ? cat : Object.values(cat).filter(Array.isArray).flat();
-      allETFs.push(...arr);
-    }
-
-    const bondItem = allETFs.find(e => e.symbol === BOND_TICKER || e.ticker === BOND_TICKER);
-    // etf-screener에서 r120d가 null이면 us/top에서 TLT 수익률 가져오기
-    let bondR = bondItem?.r120d ?? null;
-    if (bondR === null) {
-      const tltItem = (usData.data ?? usData).find(e => e.ticker === BOND_TICKER);
-      bondR = tltItem ? (tltItem.ret_6m ?? tltItem.ret6m ?? null) : null;
-    }
-    const bondName = bondItem?.name ?? 'iShares 20+ Year Treasury Bond ETF (TLT)';
-
-    decide(krR, usR, bondR);
-    renderMetrics(krR, usR, bondR, krName, usName, 'TLT · ' + bondName.slice(0, 20));
-    renderLogic(krR, usR, bondR);
-
-    // ETF 상세 행
-    const etfRows = [
-      { tag:'kr',   label:'한국 주식', name: krName,   sym: KR_TICKER,   ret: krR },
-      { tag:'us',   label:'미국 주식', name: usName,   sym: US_TICKER,   ret: usR },
-      { tag:'bond', label:'채권',      name: bondName, sym: BOND_TICKER, ret: bondR },
-    ];
-    // 추가 채권 ETF
-    ['IEF', 'BND', 'AGG'].forEach(sym => {
-      const f = allETFs.find(e => e.symbol === sym || e.ticker === sym);
-      if (f) {
-        let r = f.r120d ?? null;
-        if (r === null) {
-          const fi = (usData.data ?? usData).find(e => e.ticker === sym);
-          r = fi ? (fi.ret_6m ?? fi.ret6m ?? null) : null;
-        }
-        etfRows.push({ tag:'bond', label:'채권', name: f.name ?? sym, sym, ret: r });
-      }
-    });
-    renderETFs(etfRows);
-
-    const ts = etfData.cached_at ? new Date(etfData.cached_at).toLocaleString('ko-KR') : new Date().toLocaleString('ko-KR');
-    document.getElementById('dataTs').textContent = '데이터 기준: ' + ts;
-    document.getElementById('headerSub').textContent = '마지막 조회: ' + new Date().toLocaleTimeString('ko-KR') + ' · easyinvesting.app';
-
-  } catch(e) {
-    setBanner('idle', '데이터 로드 실패', e.message + ' — 새로고침을 눌러 재시도하세요');
-    document.getElementById('etfWrap').innerHTML = `<div class="err">${e.message}</div>`;
-    document.getElementById('headerSub').textContent = '로드 실패 · 새로고침을 눌러주세요';
-  } finally {
-    icon.className = '';
-  }
 }
 
 loadData();
