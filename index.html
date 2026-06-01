@@ -328,10 +328,22 @@ async function loadData() {
   icon.classList.add('spin');
   document.getElementById('headerSub').textContent = '데이터 불러오는 중...';
 
-  try {
-    const res = await fetch('/api/etf-screener');
+  const DIRECT = 'https://easyinvesting.app/api/etf-screener';
+  const PROXY  = 'https://corsproxy.io/?' + encodeURIComponent(DIRECT);
+
+  async function tryFetch(url) {
+    const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
+    return res.json();
+  }
+
+  try {
+    let data;
+    try {
+      data = await tryFetch(DIRECT);
+    } catch {
+      data = await tryFetch(PROXY);
+    }
     const all = flatten(data);
 
     const kr   = find(all, KR_KW);
