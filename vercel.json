@@ -4,14 +4,5 @@
       "source": "/api/etf-screener",
       "destination": "https://easyinvesting.app/api/etf-screener"
     }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Cache-Control", "value": "s-maxage=3600, stale-while-revalidate" }
-      ]
-    }
   ]
 }
