@@ -229,36 +229,11 @@ async function loadData() {
   document.getElementById('headerSub').textContent = '데이터 불러오는 중...';
 
   try {
-    // 1. 한국 주식 상위 목록에서 069500 (KODEX 200) 찾기
-    log('--- 한국 주식 조회 ---');
-    const krData = await apiFetch('/api/rs/top?limit=3000');
-    const krList = Array.isArray(krData) ? krData : (krData.data ?? krData.items ?? krData.stocks ?? []);
-    log('kr list length: ' + krList.length);
-    if (krList.length > 0) log('kr sample keys: ' + Object.keys(krList[0]).join(', '));
-
-    const krItem = findByTicker(krList, '069500');
-    log('kr item found: ' + (krItem ? krItem.ticker + ' / ' + krItem.name : 'NOT FOUND'));
-    const krR    = getRet6m(krItem);
-    const krName = krItem?.name ?? 'KODEX 200';
-    log('krR = ' + krR);
-
-    // 2. 미국 주식 상위 목록에서 SPY 찾기
-    log('--- 미국 주식 조회 ---');
-    const usData = await apiFetch('/api/rs/us/top?limit=6000');
-    const usList = Array.isArray(usData) ? usData : (usData.data ?? usData.items ?? usData.stocks ?? []);
-    log('us list length: ' + usList.length);
-    if (usList.length > 0) log('us sample keys: ' + Object.keys(usList[0]).join(', '));
-
-    const usItem = findByTicker(usList, 'SPY');
-    log('us item found: ' + (usItem ? usItem.ticker + ' / ' + usItem.name : 'NOT FOUND'));
-    const usR    = getRet6m(usItem);
-    const usName = usItem?.name ?? 'SPDR S&P 500 ETF (SPY)';
-    log('usR = ' + usR);
-
-    // 3. 채권: ETF 스크리너에서 TLT 찾기, 없으면 us/top에서
-    log('--- 채권 조회 ---');
+    // ETF 스크리너 단일 소스 — IEF/BND가 r120d로 정상 동작함을 확인
+    log('--- ETF 스크리너 조회 ---');
     const etfData = await apiFetch('/api/etf-screener');
-    log('etf cached_at: ' + etfData.cached_at);
+    log('cached_at: ' + etfData.cached_at);
+
     const allETFs = [];
     for (const cat of Object.values(etfData.categories ?? {})) {
       if (Array.isArray(cat)) { allETFs.push(...cat); continue; }
@@ -266,42 +241,55 @@ async function loadData() {
         for (const v of Object.values(cat)) { if (Array.isArray(v)) allETFs.push(...v); }
       }
     }
-    log('etf list length: ' + allETFs.length);
-    if (allETFs.length > 0) log('etf sample keys: ' + Object.keys(allETFs[0]).join(', '));
+    log('총 ETF 수: ' + allETFs.length);
+    if (allETFs.length > 0) log('필드 목록: ' + Object.keys(allETFs[0]).join(', '));
 
-    let bondItem = findByTicker(allETFs, 'TLT');
-    log('TLT in etf-screener: ' + (bondItem ? 'found, r120d=' + bondItem.r120d : 'NOT FOUND'));
+    // 한국 주식 대표: EWY (iShares MSCI South Korea ETF) — 미국 상장 한국 지수 ETF
+    // SPY 대신 VOO, IVV도 후보
+    // r120d = 약 6개월(120 거래일) 수익률
+    const KR_SYMS   = ['EWY'];
+    const US_SYMS   = ['SPY', 'VOO', 'IVV'];
+    const BOND_SYMS = ['TLT', 'IEF', 'BND', 'AGG'];
 
-    let bondR = bondItem?.r120d ?? null;
-    if (bondR === null) {
-      const tltUs = findByTicker(usList, 'TLT');
-      bondR = getRet6m(tltUs);
-      log('TLT from us/top: ' + bondR);
-    }
+    const findFirst = (syms) => {
+      for (const s of syms) {
+        const f = allETFs.find(e => (e.symbol ?? e.ticker ?? '').toUpperCase() === s);
+        if (f) { log('찾음: ' + s + ' r120d=' + f.r120d); return f; }
+        log('없음: ' + s);
+      }
+      return null;
+    };
+
+    const krItem   = findFirst(KR_SYMS);
+    const usItem   = findFirst(US_SYMS);
+    const bondItem = findFirst(BOND_SYMS);
+
+    const krR    = krItem?.r120d   ?? null;
+    const usR    = usItem?.r120d   ?? null;
+    const bondR  = bondItem?.r120d ?? null;
+    const krName   = krItem?.name   ?? 'iShares MSCI South Korea (EWY)';
+    const usName   = usItem?.name   ?? 'SPDR S&P 500 ETF (SPY)';
     const bondName = bondItem?.name ?? 'iShares 20+ Year Treasury (TLT)';
-    log('bondR = ' + bondR);
+    const krSym    = krItem?.symbol   ?? 'EWY';
+    const usSym    = usItem?.symbol   ?? 'SPY';
+    const bondSym  = bondItem?.symbol ?? 'TLT';
 
-    // 데이터 없으면 디버그 표시
-    if (krR === null || usR === null) {
-      showDebug();
-    }
+    log('krR=' + krR + ' usR=' + usR + ' bondR=' + bondR);
 
-    // 판단 로직
+    if (krR === null || usR === null) showDebug();
+
     decide(krR, usR, bondR);
     renderMetrics(krR, usR, bondR, krName, usName, bondName);
     renderLogic(krR, usR, bondR);
 
+    // ETF 상세 행
     const etfRows = [
-      { tag:'kr',   label:'한국 주식', name:krName,   sym:'069500', ret:krR },
-      { tag:'us',   label:'미국 주식', name:usName,   sym:'SPY',    ret:usR },
-      { tag:'bond', label:'채권',      name:bondName, sym:'TLT',    ret:bondR },
+      { tag:'kr',   label:'한국 주식', name:krName,   sym:krSym,   ret:krR },
+      { tag:'us',   label:'미국 주식', name:usName,   sym:usSym,   ret:usR },
     ];
-    for (const sym of ['IEF', 'BND']) {
-      const f = findByTicker(allETFs, sym) ?? findByTicker(usList, sym);
-      if (f) {
-        const r = f.r120d ?? getRet6m(f) ?? null;
-        etfRows.push({ tag:'bond', label:'채권', name:f.name ?? sym, sym, ret:r });
-      }
+    for (const s of BOND_SYMS) {
+      const f = allETFs.find(e => (e.symbol ?? e.ticker ?? '').toUpperCase() === s);
+      if (f && f.r120d != null) etfRows.push({ tag:'bond', label:'채권', name:f.name ?? s, sym:s, ret:f.r120d });
     }
     renderETFs(etfRows);
 
