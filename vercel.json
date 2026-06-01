@@ -1,7 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/rs/top",        "destination": "https://easyinvesting.app/api/rs/top" },
-    { "source": "/api/rs/us/top",     "destination": "https://easyinvesting.app/api/rs/us/top" },
-    { "source": "/api/etf-screener",  "destination": "https://easyinvesting.app/api/etf-screener" }
+    { "source": "/api/etf-screener", "destination": "https://easyinvesting.app/api/etf-screener" }
   ]
 }
